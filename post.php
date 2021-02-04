@@ -1,4 +1,41 @@
-<!DOCTYPE html>
+<?php
+    // Erreur 0 = premier chargement de la page
+    // Erreur 1 = Pas d'erreur, succès de l'envois des images
+    // Erreur 2 = Une erreur est survenue
+    $error = 0;
+    if (!empty($_POST)){
+        include("database.php");
+        try{
+            // Count # of uploaded files in array
+            $total = count($_FILES['file']['name']);
+
+            // Loop through each file
+            for( $i=0 ; $i < $total ; $i++ ) {
+
+                //Get the temp file path
+                $tmpFilePath = $_FILES['file']['tmp_name'][$i];
+
+                // get new name
+                $newName = uniqid().".".pathinfo($_FILES['file']['name'][$i], PATHINFO_EXTENSION);
+
+                //Make sure we have a file path
+                if ($tmpFilePath != ""){
+                    //Setup our new file path
+                    $newFilePath = "images/" . $newName;
+
+                    //Upload the file into the temp dir
+                    if(move_uploaded_file($tmpFilePath, $newFilePath)){
+
+                    }
+                }
+            }
+            $error=1;
+        }
+    catch(Exception $e){
+        $error = 2;
+        }
+    }
+?>
 <html>
 
 <head>
@@ -9,6 +46,7 @@
     <link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
     <link rel="stylesheet" href="assets/fonts/ionicons.min.css">
     <link rel="stylesheet" href="assets/fonts/typicons.min.css">
+    <link rel="stylesheet" href="assets/css/Contact-Form-Clean.css">
     <link rel="stylesheet" href="assets/css/Navigation-with-Search.css">
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
@@ -28,6 +66,25 @@
             </div>
         </div>
     </nav>
+    <div class="contact-clean">
+        <form method="post" action="#" enctype="multipart/form-data">
+            <h2 class="text-center">Poster quelque chose</h2>
+            <?php
+            if($error==1){
+                header("Location: index.php");
+            }
+            else
+                if($error==2){
+                    echo '<div class="alert alert-danger" role="alert">
+                    Une erreur est surevenue.
+                  </div>';
+            }
+            ?>
+            <div class="form-group"><textarea class="form-control" name="description" placeholder="Description..." rows="14" required=""></textarea></div>
+            <div class="form-group"><input type="file" name="file[]" required="" accept="image/*" multiple></div>
+            <div class="form-group"><button class="btn btn-primary" type="submit">Publier</button></div>
+        </form>
+    </div>
     <script src="assets/js/jquery.min.js"></script>
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
 </body>
