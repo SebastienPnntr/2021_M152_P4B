@@ -1,35 +1,61 @@
 <?php
 
-// NE FONCTIONNE PAS
-
-$host = '127.0.0.1';
-$db   = 'm152';
-$user = 'm152_admin';
-$pass = 'Super2021';
-$port = "3306";
-
-$options = [
-    \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,
-    \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
-    \PDO::ATTR_EMULATE_PREPARES   => false,
-];
-$dsn = "mysql:host=$host;dbname=$db;port=$port";
-try {
-     $pdo = new \PDO($dsn, $user, $pass, $options);
-} catch (\PDOException $e) {
-     throw new \PDOException($e->getMessage(), (int)$e->getCode());
+function connect()
+{
+    static $myDb = null;
+    $dbName = "m152";
+    $dbUser = "m152_admin";
+    $dbPass = "Super2021";
+    if ($myDb === null) {
+        try {
+            $myDb = new PDO(
+                "mysql:host=localhost;dbname=$dbName;charset=utf8",
+                $dbUser,
+                $dbPass,
+                array(
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_EMULATE_PREPARES => false, PDO::ATTR_PERSISTENT => true
+                )
+            );
+        } catch (Exception $e) {
+            die("Impossible de se connecter à la base " . $e->getMessage());
+        }
+    }
+    return $myDb;
 }
 
-function insertImage($type, $nom, $creationDate, $modificationDate){
-    $data = [
-        'typeMedia' => $$type,
-        'nomMedia' => $nom,
-        'creationDate' => $creationDate,
-        'modificationDate' => $modificationDate,
-    ];
-    $sql = "INSERT INTO media (typeMedia, nomMedia, creationDate, modificationDate) VALUES (:typeMedia, :nomMedia, :creationDate, :modificationDate)";
-    $stmt= $pdo->prepare($sql);
-    $stmt->execute($data);
+function addMedia($type, $nom, $creationDate, $modificationDate, $idPost)
+{
+
+    $sql = "INSERT INTO media (typeMedia, nomMedia, creationDate, modificationDate, idPost) VALUES (:typeMedia, :nomMedia, :creationDate, :modificationDate, :idPost)";
+
+    $query = connect()->prepare($sql);
+
+    $query->execute([
+        ':typeMedia' => $type,
+        ':nomMedia' => $nom,
+        ':creationDate' => $creationDate,
+        ':modificationDate' => $modificationDate,
+        ':idPost' => $idPost,
+    ]);
+    return $query->fetchAll(PDO::FETCH_ASSOC);
 }
+
+function addPost($commentaire, $creationDate, $modificationDate)
+{
+
+    $sql = "INSERT INTO post (commentaire, creationDate, modificationDate) VALUES (:commentaire, :creationDate, :modificationDate)";
+
+    $query = connect()->prepare($sql);
+
+    $query->execute([
+        ':commentaire' => $commentaire,
+        ':creationDate' => $creationDate,
+        ':modificationDate' => $modificationDate,
+    ]);
+    $id = connect()->lastInsertId();
+    return array($query->fetchAll(PDO::FETCH_ASSOC), $id);
+}
+
 
 ?>

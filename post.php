@@ -1,40 +1,60 @@
 <?php
-    // Erreur 0 = premier chargement de la page
-    // Erreur 1 = Pas d'erreur, succès de l'envois des images
-    // Erreur 2 = Une erreur est survenue
-    $error = 0;
-    if (!empty($_POST)){
-        include("database.php");
-        try{
-            // Count # of uploaded files in array
-            $total = count($_FILES['file']['name']);
+// Erreur 0 = premier chargement de la page
+// Erreur 1 = Pas d'erreur, succès de l'envois des images
+// Erreur 2 = Une erreur est survenue
+// Erreur 3 = Pas une image
+$error = 0;
+if (!empty($_POST)) {
+    include("database.php");
+    try {
+        // Count # of uploaded files in array
+        $total = count($_FILES['file']['name']);
+
+
+        // Ajout le post dans la DB
+        $commentaire = filter_input(INPUT_POST, "description", FILTER_SANITIZE_STRING);
+        $lastId = addPost($commentaire, date("Y.m.d"), date("Y.m.d"))[1];
 
             // Loop through each file
-            for( $i=0 ; $i < $total ; $i++ ) {
+            for ($i = 0; $i < $total; $i++) {
 
                 //Get the temp file path
                 $tmpFilePath = $_FILES['file']['tmp_name'][$i];
 
                 // get new name
-                $newName = uniqid().".".pathinfo($_FILES['file']['name'][$i], PATHINFO_EXTENSION);
+                $newName = uniqid() . "." . pathinfo($_FILES['file']['name'][$i], PATHINFO_EXTENSION);
 
+                $extension = pathinfo($_FILES['file']['name'][$i], PATHINFO_EXTENSION);
+                if($extension=="png" || $extension=="jpg" || $extension=="gif"){
+                    
+                }
+                else{
+                    $error = 3;
+                }
+
+                if($error!=3){
                 //Make sure we have a file path
-                if ($tmpFilePath != ""){
+                if ($tmpFilePath != "") {
                     //Setup our new file path
                     $newFilePath = "images/" . $newName;
 
-                    //Upload the file into the temp dir
-                    if(move_uploaded_file($tmpFilePath, $newFilePath)){
 
+                   
+
+                    //Upload the file into the temp dir
+                    if (move_uploaded_file($tmpFilePath, $newFilePath)) {
+                        // S'il y a des images, bouge les images dans images/ et ajoutes dans la DB
+                        addMedia($extension, $newName, date("Y.m.d"), date("Y.m.d"), $lastId);
                     }
                 }
             }
-            $error=1;
-        }
-    catch(Exception $e){
+            }
+            
+        $error = 1;
+    } catch (Exception $e) {
         $error = 2;
-        }
     }
+}
 ?>
 <html>
 
@@ -70,18 +90,22 @@
         <form method="post" action="#" enctype="multipart/form-data">
             <h2 class="text-center">Poster quelque chose</h2>
             <?php
-            if($error==1){
+            if ($error == 1) {
                 header("Location: index.php");
-            }
-            else
-                if($error==2){
-                    echo '<div class="alert alert-danger" role="alert">
+            } else
+                if ($error == 2) {
+                echo '<div class="alert alert-danger" role="alert">
                     Une erreur est surevenue.
                   </div>';
             }
+            else if($error==3){
+                echo'<div class="alert alert-danger" role="alert">
+                Seulement les .gif .png et .jpg sont acceptés!
+              </div>';
+            }
             ?>
             <div class="form-group"><textarea class="form-control" name="description" placeholder="Description..." rows="14" required=""></textarea></div>
-            <div class="form-group"><input type="file" name="file[]" required="" accept="image/*" multiple></div>
+            <div class="form-group"><input type="file" name="file[]" accept="image/*" multiple></div>
             <div class="form-group"><button class="btn btn-primary" type="submit">Publier</button></div>
         </form>
     </div>
