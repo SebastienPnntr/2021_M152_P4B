@@ -18,7 +18,11 @@ if (!empty($_POST)) {
             // Loop through each file
             for ($i = 0; $i < $total; $i++) {
 
-                //Get the temp file path
+                if($_FILES['file']['size'][$i] > 3145728) { //2 MB (size is also in bytes)
+                    $error = 2;
+                    break 1;
+                } else {
+                    //Get the temp file path
                 $tmpFilePath = $_FILES['file']['tmp_name'][$i];
 
                 // get new name
@@ -47,10 +51,13 @@ if (!empty($_POST)) {
                         addMedia($extension, $newName, date("Y.m.d"), date("Y.m.d"), $lastId);
                     }
                 }
-            }
-            }
+                }
             
-        $error = 1;
+            }
+            $error = 1; 
+        }
+        
+        
     } catch (Exception $e) {
         $error = 2;
     }

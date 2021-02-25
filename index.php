@@ -1,4 +1,10 @@
-<!DOCTYPE html>
+<?php
+    include('database.php');
+
+    $listPost = getAllPost();
+    
+    
+?>
 <html>
 
 <head>
@@ -46,18 +52,30 @@
         </div>
     </div>
     <div>
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6"></div>
-                <div class="col-md-6">
-                    <div class="card"><img class="card-img-top w-100 d-block" src="assets/img/photo.jpg">
-                        <div class="card-body">
-                            <h4 class="card-title">Exemple de post</h4>
-                        </div>
+    <?php
+    foreach($listPost as $item){
+        $image = getAllMediaById($item['idPost']);
+        echo '<div class="container">
+        <div class="row">
+            <div class="col-md-6"></div>
+            <div class="col-md-6">
+                <div class="card">';
+                foreach($image as $imageToPost){
+                    echo '<img class="card-img-top w-100 d-block" src="images/'.$imageToPost['nomMedia'].'">';
+                }
+                echo '
+                    <div class="card-body">
+                        <h4 class="card-title">'.$item["commentaire"].'</h4>
+                        <i class="bi bi-trash"></i>
                     </div>
+                    <button>Editer</button><button>Supprimer</button>
                 </div>
             </div>
         </div>
+    </div>';
+    }
+    ?>
+        
     </div>
     <script src="assets/js/jquery.min.js"></script>
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>

@@ -57,5 +57,28 @@ function addPost($commentaire, $creationDate, $modificationDate)
     return array($query->fetchAll(PDO::FETCH_ASSOC), $id);
 }
 
+function getAllPost(){
+
+    $sql = "SELECT * FROM post ORDER BY idPost DESC";
+
+    $query = connect()->prepare($sql);
+
+    $query->execute([
+        
+    ]);
+    return $query->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function getAllMediaById($id){
+
+    $sql = "SELECT * FROM media WHERE idPost = :id";
+
+    $query = connect()->prepare($sql);
+
+    $query->execute([
+        ':id' => $id,
+    ]);
+    return $query->fetchAll(PDO::FETCH_ASSOC);
+}
 
 ?>
