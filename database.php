@@ -26,35 +26,59 @@ function connect()
 
 function addMedia($type, $nom, $creationDate, $modificationDate, $idPost)
 {
+    /* Demande à mysqli de lancer une exception si une erreur survient */
+    mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-    $sql = "INSERT INTO media (typeMedia, nomMedia, creationDate, modificationDate, idPost) VALUES (:typeMedia, :nomMedia, :creationDate, :modificationDate, :idPost)";
+    $mysqli = new mysqli("localhost", "my_user", "my_password", "world");
 
-    $query = connect()->prepare($sql);
+    /* Démarre la transaction */
+    $mysqli->begin_transaction();
 
-    $query->execute([
-        ':typeMedia' => $type,
-        ':nomMedia' => $nom,
-        ':creationDate' => $creationDate,
-        ':modificationDate' => $modificationDate,
-        ':idPost' => $idPost,
-    ]);
-    return $query->fetchAll(PDO::FETCH_ASSOC);
+    try {
+        $sql = "INSERT INTO media (typeMedia, nomMedia, creationDate, modificationDate, idPost) VALUES (:typeMedia, :nomMedia, :creationDate, :modificationDate, :idPost)";
+
+        $query = connect()->prepare($sql);
+
+        $query->execute([
+            ':typeMedia' => $type,
+            ':nomMedia' => $nom,
+            ':creationDate' => $creationDate,
+            ':modificationDate' => $modificationDate,
+            ':idPost' => $idPost,
+        ]);
+        return $query->fetchAll(PDO::FETCH_ASSOC);
+    } catch (mysqli_sql_exception $exception) {
+        $mysqli->rollback();
+        throw $exception;
+    }
 }
 
 function addPost($commentaire, $creationDate, $modificationDate)
 {
+    /* Demande à mysqli de lancer une exception si une erreur survient */
+    mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-    $sql = "INSERT INTO post (commentaire, creationDate, modificationDate) VALUES (:commentaire, :creationDate, :modificationDate)";
+    $mysqli = new mysqli("localhost", "my_user", "my_password", "world");
 
-    $query = connect()->prepare($sql);
+    /* Démarre la transaction */
+    $mysqli->begin_transaction();
 
-    $query->execute([
-        ':commentaire' => $commentaire,
-        ':creationDate' => $creationDate,
-        ':modificationDate' => $modificationDate,
-    ]);
-    $id = connect()->lastInsertId();
-    return array($query->fetchAll(PDO::FETCH_ASSOC), $id);
+    try {
+        $sql = "INSERT INTO post (commentaire, creationDate, modificationDate) VALUES (:commentaire, :creationDate, :modificationDate)";
+
+        $query = connect()->prepare($sql);
+
+        $query->execute([
+            ':commentaire' => $commentaire,
+            ':creationDate' => $creationDate,
+            ':modificationDate' => $modificationDate,
+        ]);
+        $id = connect()->lastInsertId();
+        return array($query->fetchAll(PDO::FETCH_ASSOC), $id);
+    } catch (mysqli_sql_exception $exception) {
+        $mysqli->rollback();
+        throw $exception;
+    }
 }
 
 function getAllPost(){
