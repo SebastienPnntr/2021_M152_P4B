@@ -29,7 +29,7 @@ function addMedia($type, $nom, $creationDate, $modificationDate, $idPost)
     /* Demande à mysqli de lancer une exception si une erreur survient */
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-    $mysqli = new mysqli("localhost", "my_user", "my_password", "world");
+    $mysqli = new mysqli("localhost", "m152_admin", "Super2021", "m152");
 
     /* Démarre la transaction */
     $mysqli->begin_transaction();
@@ -58,7 +58,7 @@ function addPost($commentaire, $creationDate, $modificationDate)
     /* Demande à mysqli de lancer une exception si une erreur survient */
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-    $mysqli = new mysqli("localhost", "my_user", "my_password", "world");
+    $mysqli = new mysqli("localhost", "m152_admin", "Super2021", "m152");
 
     /* Démarre la transaction */
     $mysqli->begin_transaction();

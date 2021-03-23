@@ -61,7 +61,20 @@
             <div class="col-md-6">
                 <div class="card">';
                 foreach($image as $imageToPost){
-                    echo '<img class="card-img-top w-100 d-block" src="images/'.$imageToPost['nomMedia'].'">';
+                    if($imageToPost["typeMedia"]=="mp4"){
+                        echo '<video width="538" height="538" autoplay muted controls loop>
+                        <source src="medias/'.$imageToPost['nomMedia'].'" type="video/mp4">
+                      </video>';
+                    }
+                    else if($imageToPost["typeMedia"]=="mp3"){
+                        echo '<audio controls>
+                        <source src="medias/'.$imageToPost['nomMedia'].'" type="audio/mpeg">
+                      Your browser does not support the audio element.
+                      </audio>';
+                    }
+                    else{
+                        echo '<img class="card-img-top w-100 d-block" src="medias/'.$imageToPost['nomMedia'].'">';
+                    }
                 }
                 echo '
                     <div class="card-body">

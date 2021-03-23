@@ -1,8 +1,9 @@
 <?php
 // Erreur 0 = premier chargement de la page
-// Erreur 1 = Pas d'erreur, succès de l'envois des images
+// Erreur 1 = Pas d'erreur, succès de l'envois des medias
 // Erreur 2 = Une erreur est survenue
 // Erreur 3 = Pas une image
+// Erreur 4 = taille
 $error = 0;
 if (!empty($_POST)) {
     include("database.php");
@@ -18,8 +19,8 @@ if (!empty($_POST)) {
             // Loop through each file
             for ($i = 0; $i < $total; $i++) {
 
-                if($_FILES['file']['size'][$i] > 3145728) { //2 MB (size is also in bytes)
-                    $error = 2;
+                if($_FILES['file']['size'][$i] > 3145728) { //3 MB (size is also in bytes)
+                    $error = 4;
                     break 1;
                 } else {
                     //Get the temp file path
@@ -29,29 +30,23 @@ if (!empty($_POST)) {
                 $newName = uniqid() . "." . pathinfo($_FILES['file']['name'][$i], PATHINFO_EXTENSION);
 
                 $extension = pathinfo($_FILES['file']['name'][$i], PATHINFO_EXTENSION);
-                if($extension=="png" || $extension=="jpg" || $extension=="gif"){
-                    
+
+                if($extension=="png" || $extension=="jpg" || $extension=="gif" || $extension=="mp4" || $extension=="mp3"){
+                    //Make sure we have a file path
+                    if ($tmpFilePath != "") {
+                        //Setup our new file path
+                        $newFilePath = "medias/" . $newName;
+                        //Upload the file into the temp dir
+                        if (move_uploaded_file($tmpFilePath, $newFilePath)) {
+                            // S'il y a des medias, bouge les medias dans medias/ et ajoutes dans la DB
+                            addMedia($extension, $newName, date("Y.m.d"), date("Y.m.d"), $lastId);
+                        }
+                    }
                 }
                 else{
                     $error = 3;
                 }
 
-                if($error!=3){
-                //Make sure we have a file path
-                if ($tmpFilePath != "") {
-                    //Setup our new file path
-                    $newFilePath = "images/" . $newName;
-
-
-                   
-
-                    //Upload the file into the temp dir
-                    if (move_uploaded_file($tmpFilePath, $newFilePath)) {
-                        // S'il y a des images, bouge les images dans images/ et ajoutes dans la DB
-                        addMedia($extension, $newName, date("Y.m.d"), date("Y.m.d"), $lastId);
-                    }
-                }
-                }
             
             }
             $error = 1; 
@@ -110,9 +105,14 @@ if (!empty($_POST)) {
                 Seulement les .gif .png et .jpg sont acceptés!
               </div>';
             }
+            else if($error==4){
+                echo'<div class="alert alert-danger" role="alert">
+                Vos / Votre fichier est trop volumineux.
+              </div>';
+            }
             ?>
             <div class="form-group"><textarea class="form-control" name="description" placeholder="Description..." rows="14" required=""></textarea></div>
-            <div class="form-group"><input type="file" name="file[]" accept="image/*" multiple></div>
+            <div class="form-group"><input type="file" name="file[]" accept="image/*, video/*, audio/*" multiple></div>
             <div class="form-group"><button class="btn btn-primary" type="submit">Publier</button></div>
         </form>
     </div>
