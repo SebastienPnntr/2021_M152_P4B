@@ -81,7 +81,14 @@
                         <h4 class="card-title">'.$item["commentaire"].'</h4>
                         <i class="bi bi-trash"></i>
                     </div>
-                    <button>Editer</button><button>Supprimer</button>
+                <form action="edit.php" method="post">
+                    <input type="hidden" value="'.$item["idPost"].'" name="postIdEdit">
+                    <button class="btn btn-warning action-button" role="button" type="submit"><i class="typcn typcn-pen"></i></button>
+                </form>
+                <form action="delete.php" method="post">
+                    <input type="hidden" value="'.$item["idPost"].'" name="postIdDelete">
+                    <button class="btn btn-danger action-button" role="button" type="submit"><i class="typcn typcn-trash"></i></button>
+                </form>
                 </div>
             </div>
         </div>

@@ -105,4 +105,27 @@ function getAllMediaById($id){
     return $query->fetchAll(PDO::FETCH_ASSOC);
 }
 
+function deletePost($id){
+
+    $sql = "DELETE FROM post WHERE idPost = :id";
+
+    $query = connect()->prepare($sql);
+
+    $query->execute([
+        ':id' => $id,
+    ]);
+    return $query->fetchAll(PDO::FETCH_ASSOC);
+}
+function deleteMedia($id){
+
+    $sql = "DELETE FROM media WHERE idMedia = :id";
+
+    $query = connect()->prepare($sql);
+
+    $query->execute([
+        ':id' => $id,
+    ]);
+    return $query->fetchAll(PDO::FETCH_ASSOC);
+}
+
 ?>

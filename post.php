@@ -5,6 +5,7 @@
 // Erreur 3 = Pas une image
 // Erreur 4 = taille
 $error = 0;
+$fileSize = 0;
 if (!empty($_POST)) {
     include("database.php");
     try {
@@ -16,6 +17,14 @@ if (!empty($_POST)) {
         $commentaire = filter_input(INPUT_POST, "description", FILTER_SANITIZE_STRING);
         $lastId = addPost($commentaire, date("Y.m.d"), date("Y.m.d"))[1];
 
+        // Calcul la taille de tout les fichiers et stock dans une variable
+        for ($i = 0; $i < $total; $i++) {
+            $fileSize+=$_FILES['file']['size'][$i];
+            var_dump($fileSize);
+        }
+
+        // Si la taille de tout les fichiers est plus grande que 70MB (73400320 en bytes) alors affiche une erreur.
+        if($fileSize<=73400320){
             // Loop through each file
             for ($i = 0; $i < $total; $i++) {
 
@@ -23,6 +32,7 @@ if (!empty($_POST)) {
                     $error = 4;
                     break 1;
                 } else {
+
                     //Get the temp file path
                 $tmpFilePath = $_FILES['file']['tmp_name'][$i];
 
@@ -51,6 +61,10 @@ if (!empty($_POST)) {
             }
             $error = 1; 
         }
+    }
+    else{
+        $error=4;
+    }
         
         
     } catch (Exception $e) {
