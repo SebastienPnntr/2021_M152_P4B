@@ -51,6 +51,11 @@ if (!empty($_POST)) {
                             // S'il y a des medias, bouge les medias dans medias/ et ajoutes dans la DB
                             addMedia($extension, $newName, date("Y.m.d"), date("Y.m.d"), $lastId);
                         }
+                        else{
+                            if($total>0){
+                                $erreur = 2;
+                            }
+                        }
                     }
                 }
                 else{
